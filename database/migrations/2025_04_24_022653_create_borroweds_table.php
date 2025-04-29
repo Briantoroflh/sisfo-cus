@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('borroweds', function (Blueprint $table) {
             $table->id('id_borrowed');
             $table->unsignedBigInteger('id_user');
-            $table->string('used_for');
             $table->dateTime('date_borrowed');
+            $table->dateTime('due_date');
+            $table->enum('status', ['approved', 'not approved']);
             $table->timestamps();
 
             $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');

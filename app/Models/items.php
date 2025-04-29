@@ -10,8 +10,8 @@ class items extends Model
     use HasFactory;
 
     protected $table = 'items';
+    protected $primaryKey = 'id_items';
     protected $fillable = [
-        'id_items',
         'item_name',
         'item_image',
         'code_items',
@@ -24,16 +24,11 @@ class items extends Model
 
     public function category()
     {
-        return $this->belongsTo(CategoryItems::class, 'id_category');
+        return $this->belongsTo(CategoryItems::class, 'id_category', 'id_category');
     }
 
-    public function detailBorrows()
+    public function detailsBorrow()
     {
-        return $this->hasMany(DetailsBorrow::class, 'id_items');
-    }
-
-    public function detailReturns()
-    {
-        return $this->hasMany(DetailReturns::class, 'id_items');
+        return $this->hasMany(DetailsBorrow::class, 'id_items', 'id_items');
     }
 }

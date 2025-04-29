@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id('id_user');
-            $table->enum('role', ['guru', 'siswa']);
             $table->string('name');
-            $table->enum('class', ['X', 'XI', 'XII'])->nullable();
+            $table->string('email')->unique();
             $table->string('password');
+            $table->enum('role', ['user', 'admin']);
+            $table->enum('class', ['X', 'XI', 'XII','ANON'])->nullable();
             $table->enum('major', ['RPL', 'PSPT', 'ANIMASI', 'TJKT', 'TE'])->nullable();
             $table->timestamps();
         });

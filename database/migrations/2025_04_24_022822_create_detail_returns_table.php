@@ -13,12 +13,9 @@ return new class extends Migration
     {
         Schema::create('detail_returns', function (Blueprint $table) {
             $table->id('id_detail_return');
-            $table->unsignedBigInteger('id_borrowed');
-            $table->unsignedBigInteger('id_items');
+            $table->foreignId('id_details_borrow')->constrained('details_borrows', 'id_details_borrow')->onDelete('cascade');
+            $table->dateTime('date_return');
             $table->timestamps();
-
-            $table->foreign('id_borrowed')->references('id_borrowed')->on('borroweds')->onDelete('cascade');
-            $table->foreign('id_items')->references('id_items')->on('items')->onDelete('cascade');
         });
     }
 

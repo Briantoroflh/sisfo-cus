@@ -17,12 +17,13 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    protected $primaryKey = 'id_user';
     protected $fillable = [
-        'id_user',
-        'role',
         'name',
-        'class',
+        'email',
         'password',
+        'role',
+        'class',
         'major'
     ];
 
@@ -45,8 +46,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function borrowings()
+    public function borrowed()
     {
-        return $this->hasMany(Borrowed::class, 'id_user');
+        return $this->hasMany(Borrowed::class, 'id_user', 'id_user');
     }
 }

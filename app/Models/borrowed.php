@@ -10,25 +10,21 @@ class borrowed extends Model
     use HasFactory;
 
     protected $table = 'borroweds';
+    protected $primaryKey = 'id_borrowed';
     protected $fillable = [
-        'id_borrowed',
         'id_user',
-        'used_for',
-        'date_borrowed'
+        'date_borrowed',
+        'due_date',
+        'status'
     ];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->belongsTo(User::class, 'id_user', 'id_user');
     }
 
-    public function details()
+    public function detailsBorrow()
     {
-        return $this->hasMany(DetailsBorrow::class, 'id_borrowed');
-    }
-
-    public function return()
-    {
-        return $this->hasOne(ReturnItems::class, 'id_borrow');
+        return $this->hasMany(DetailsBorrow::class, 'id_borrowed', 'id_borrowed');
     }
 }

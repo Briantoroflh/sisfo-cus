@@ -10,19 +10,14 @@ class DetailReturns extends Model
     use HasFactory;
 
     protected $table = 'detail_returns';
+    protected $primaryKey = 'id_detail_return';
     protected $fillable = [
-        'id_detail_return',
-        'id_borrowed',
-        'id_items'
+        'id_details_borrow',
+        'date_return'
     ];
 
-    public function item()
+    public function detailsBorrow()
     {
-        return $this->belongsTo(items::class, 'id_items');
-    }
-
-    public function borrowed()
-    {
-        return $this->belongsTo(Borrowed::class, 'id_borrowed');
+        return $this->belongsTo(DetailsBorrow::class, 'id_details_borrow', 'id_details_borrow');
     }
 }

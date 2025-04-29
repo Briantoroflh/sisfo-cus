@@ -9,14 +9,13 @@ class CategoryItems extends Model
 {
     use HasFactory;
     protected $table = 'category_items';
+    protected $primaryKey = 'id_category';
     protected $fillable = [
-        'id_category',
-        'category_name',
-        'description'
+        'category_name'
     ];
 
     public function items()
     {
-        return $this->hasMany(items::class, 'id_category');
+        return $this->hasMany(Items::class, 'id_category', 'id_category');
     }
 }
