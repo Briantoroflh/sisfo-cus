@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -26,7 +27,7 @@ class AuthController extends Controller
             }
 
             $token = $user->createToken('API_TOKEN')->plainTextToken;
-            if(!$token) {
+            if (!$token) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Token not found!'
@@ -43,10 +44,18 @@ class AuthController extends Controller
         } catch (QueryException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'Login failed!',
+                'error' => $e->getMessage()
             ]);
         }
     }
 
-    public function Me() {}
+    public function Me(): JsonResponse {
+        $user = Auth::user();
+        return response()->json([
+            'success' => true,
+            'message' => '',
+            'data' => new UserResource($user)
+        ]);
+    }
 }

@@ -23,5 +23,13 @@ class Userseeder extends Seeder
             'class' => 'XI',
             'major' => 'RPL'
         ]);
+        DB::table('users')->insert([
+            'name' => Str::random(2),
+            'email' => Str::random(2) . '@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'user',
+            'class' => 'X',
+            'major' => 'RPL'
+        ]);
     }
 }
