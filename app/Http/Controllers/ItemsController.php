@@ -2,38 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ItemsReq;
+use App\Http\Resources\ItemsResource;
 use App\Models\items;
 use App\Models\CategoryItems;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ItemsController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $items = items::with('category')->get();
-        return view('items.index', compact('items'));
+
+        if ($items->count() < 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ada di koleksi!'
+            ])->setStatusCode(404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => '',
+            'data' => ItemsResource::collection($items)
+        ])->setStatusCode(200);
     }
 
-    public function create()
+    public function store(ItemsReq $request): JsonResponse
     {
-        $categories = CategoryItems::all();
-        return view('items.create', compact('categories'));
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'item_name' => 'required|string|max:255',
-            'item_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'code_items' => 'required|string|max:100|unique:items',
-            'id_category' => 'required|exists:category_items,id_category',
-            'stock' => 'required|integer|min:0',
-            'brand' => 'nullable|string|max:100',
-            'status' => 'required|string',
-            'item_condition' => 'required|string',
-        ]);
-
-        $data = $request->all();
+        $data = $request->validated();
 
         if ($request->hasFile('item_image')) {
             $data['item_image'] = $request->file('item_image')->store('item_images', 'public');
@@ -41,38 +39,43 @@ class ItemsController extends Controller
 
         items::create($data);
 
-        return redirect()->route('items.index')->with('success', 'Item berhasil ditambahkan.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Item berhasil ditambahkan!',
+            'data' => new ItemsResource($data)
+        ])->setStatusCode(201);
     }
 
-    public function show($id)
+    public function show($id): JsonResponse
     {
-        $item = items::with('category')->findOrFail($id);
-        return view('items.show', compact('item'));
+        $item = items::with('category')->find($id);
+
+        if (!$item) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ada di koleksi!'
+            ])->setStatusCode(404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => '',
+            'data' => new ItemsResource($item)
+        ])->setStatusCode(200);
     }
 
-    public function edit($id)
+    public function update(ItemsReq $request, int $id): JsonResponse
     {
         $item = items::findOrFail($id);
-        $categories = CategoryItems::all();
-        return view('items.edit', compact('item', 'categories'));
-    }
+        
+        if (!$item) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ada di koleksi!'
+            ])->setStatusCode(404);
+        }
 
-    public function update(Request $request, $id)
-    {
-        $item = items::findOrFail($id);
-
-        $request->validate([
-            'item_name' => 'required|string|max:255',
-            'item_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'code_items' => 'required|string|max:100|unique:items,code_items,' . $item->id_items . ',id_items',
-            'id_category' => 'required|exists:category_items,id_category',
-            'stock' => 'required|integer|min:0',
-            'brand' => 'nullable|string|max:100',
-            'status' => 'required|string',
-            'item_condition' => 'required|string',
-        ]);
-
-        $data = $request->all();
+        $data = $request->validated();
 
         if ($request->hasFile('item_image')) {
             $data['item_image'] = $request->file('item_image')->store('item_images', 'public');
@@ -80,14 +83,29 @@ class ItemsController extends Controller
 
         $item->update($data);
 
-        return redirect()->route('items.index')->with('success', 'Item berhasil diperbarui.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Item berhasil diperbarui!',
+            'data' => new ItemsResource($item)
+        ])->setStatusCode(200);
     }
 
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
         $item = items::findOrFail($id);
+
+        if (!$item) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ada di koleksi!'
+            ])->setStatusCode(404);
+        }
+
         $item->delete();
 
-        return redirect()->route('items.index')->with('success', 'Item berhasil dihapus.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Item berhasil dihapus!'
+        ])->setStatusCode(200);
     }
 }

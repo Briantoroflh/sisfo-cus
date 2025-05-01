@@ -2,63 +2,100 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CategoryItemsReq;
+use App\Http\Resources\CategoryItemsResource;
 use App\Models\CategoryItems;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CategoryItemsController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $categories = CategoryItems::all();
-        return view('category_items.index', compact('categories'));
-    }
 
-    public function create()
-    {
-        return view('category_items.create');
-    }
+        if($categories->count() < 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ada di koleksi!'
+            ])->setStatusCode(404);
+        }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'category_name' => 'required|string|max:255|unique:category_items',
+        return response()->json([
+            'success' => true,
+            'message' => '',
+            'data' => CategoryItemsResource::collection($categories)
         ]);
 
-        CategoryItems::create($request->all());
-
-        return redirect()->route('category_items.index')->with('success', 'Kategori berhasil ditambahkan.');
     }
 
-    public function show($id)
+    public function store(CategoryItemsReq $request): JsonResponse
     {
-        $category = CategoryItems::with('items')->findOrFail($id);
-        return view('category_items.show', compact('category'));
+        $req = $request->validated();
+
+        CategoryItems::create($req);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kategori berhasil ditambahkan!',
+            'data' => new CategoryItemsResource($req)
+        ])->setStatusCode(201);
     }
 
-    public function edit($id)
+    public function show($id): JsonResponse
+    {
+        $category = CategoryItems::with('items')->find($id);
+
+        if (!$category) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ada di koleksi!'
+            ])->setStatusCode(404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => '',
+            'data' => new CategoryItemsResource($category)
+        ])->setStatusCode(200);
+    }
+
+    public function update(CategoryItemsReq $request, $id): JsonResponse
     {
         $category = CategoryItems::findOrFail($id);
-        return view('category_items.edit', compact('category'));
+
+        if (!$category) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ada di koleksi!'
+            ])->setStatusCode(404);
+        }
+
+        $category->update($request->validated());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kategori berhasil diperbarui!',
+            'data' => new CategoryItemsResource($category)
+        ])->setStatusCode(200);
     }
 
-    public function update(Request $request, $id)
+    public function destroy($id): JsonResponse
     {
-        $category = CategoryItems::findOrFail($id);
+        $category = CategoryItems::find($id);
 
-        $request->validate([
-            'category_name' => 'required|string|max:255|unique:category_items,category_name,' . $category->id_category . ',id_category',
-        ]);
+        if (!$category) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ada di koleksi!'
+            ])->setStatusCode(404);
+        }
 
-        $category->update($request->all());
-
-        return redirect()->route('category_items.index')->with('success', 'Kategori berhasil diperbarui.');
-    }
-
-    public function destroy($id)
-    {
-        $category = CategoryItems::findOrFail($id);
         $category->delete();
 
-        return redirect()->route('category_items.index')->with('success', 'Kategori berhasil dihapus.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Kategori berhasil dihapus!'
+        ])->setStatusCode(200);
     }
 }

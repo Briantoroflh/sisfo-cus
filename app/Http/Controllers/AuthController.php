@@ -19,11 +19,11 @@ class AuthController extends Controller
             $req = $request->validated();
             $user = User::where('email', $req['email'])->first();
 
-            if (!$user || !Hash::check('password', $user->password)) {
+            if (!$user || !Hash::check($req['password'], $user->password)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Email dan password tidak di temukan!'
-                ]);
+                    'message' => 'Email atau password tidak di temukan!'
+                ])->setStatusCode(404);
             }
 
             $token = $user->createToken('API_TOKEN')->plainTextToken;
@@ -31,7 +31,7 @@ class AuthController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Token not found!'
-                ]);
+                ])->setStatusCode(401);
             }
 
             return response()->json([
@@ -40,7 +40,7 @@ class AuthController extends Controller
                 'token' => $token,
                 'token_type' => 'Bearer',
                 'data' => new UserResource($user)
-            ]);
+            ])->setStatusCode(200);
         } catch (QueryException $e) {
             return response()->json([
                 'success' => false,

@@ -7,6 +7,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -45,13 +46,24 @@ class UserController extends Controller
             'success' => true,
             'message' => '',
             'data' => new UserResource($user)
-        ])->setStatusCode(200);
+        ])->setStatusCode(200); 
     }
 
     //createUser
     public function store(UserCreateReq $request): JsonResponse
     {
-        $user = User::create($request->validated());
+        $req = $request->validated();
+        
+        if(User::where('email', $req['email'])->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email sudah terdaftar!'
+            ])->setStatusCode(409);
+        }
+        
+        $user = new User($req);
+        $user->password = Hash::make($req['password']);
+        $user->save();
 
         return response()->json([
             'success' => true,
@@ -72,6 +84,7 @@ class UserController extends Controller
             ])->setStatusCode(404);
         }
 
+       
         $user->update($request->validated());
 
         return response()->json([
@@ -84,7 +97,7 @@ class UserController extends Controller
     //deleteUser
     public function destroy(int $id): JsonResponse
     {
-        $user = User::find($id);
+        $user = User::where('id_user', $id)->first();
 
         if (!$user) {
             return response()->json([

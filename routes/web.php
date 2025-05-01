@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +14,47 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
 Route::get('/', function () {
-    return view('welcome');
+    return view('Login.Login');
 });
+
+// Route::middleware(RoleMiddleware::class)->group(function () {
+    
+// });
+
+Route::get('/dashboard', function () {
+    return view('Dashboard.Home');
+});
+
+Route::get('/dashboard/users', function () {
+    return view('UserPage.Home');
+});
+
+Route::get('/dashboard/users/create', function () {
+    return view('UserPage.Create');
+});
+
+Route::get('/dashboard/users/edit/{id}', function () {
+    return view('UserPage.Edit');
+})->where('id', '[0-9]+');
+
+Route::get('/dashboard/category-items', function () {
+    return view('KategoriPage.Home');
+});
+
+Route::get('/dashboard/items', function () {
+    return view('ItemsPage.Home');
+});
+
+Route::get('/dashboard/peminjaman', function () {
+    return view('PeminjamanPage.Home');
+});
+
+Route::get('/dashboard/pengembalian', function () {
+    return view('PengembalianPage.Home');
+});
+

@@ -21,7 +21,7 @@ class RoleMiddleware
         if($user->role == 'user') {
             return response()->json([
                 'message' => "You don't have permission!❌"
-            ]);
+            ])->setStatusCode(403);
         }else {
             return $next($request);
         }

@@ -2,72 +2,100 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BorrowReq;
+use App\Http\Requests\DetailBorrowReq;
+use App\Http\Resources\BorrowedResource;
 use App\Models\borrowed;
+use App\Models\items;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class BorrowedController extends Controller
 {
     public function index()
     {
-        $borroweds = borrowed::with(['user', 'detailsBorrow'])->get();
-        return view('borrowed.index', compact('borroweds'));
-    }
-
-    public function create()
-    {
-        $users = User::all();
-        return view('borrowed.create', compact('users'));
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'id_user' => 'required|exists:users,id_user',
-            'date_borrowed' => 'required|date',
-            'due_date' => 'required|date|after_or_equal:date_borrowed',
-            'status' => 'required|string|max:50'
+        $data = Borrowed::with(['user', 'detailsBorrow.item'])->latest()->get();
+        return response()->json([
+            'success' => true,
+            'message' => 'List of borrow requests',
+            'data' => BorrowedResource::collection($data)
         ]);
-
-        borrowed::create($request->all());
-
-        return redirect()->route('borrowed.index')->with('success', 'Data peminjaman berhasil ditambahkan.');
     }
 
     public function show($id)
     {
-        $borrow = borrowed::with(['user', 'detailsBorrow'])->findOrFail($id);
-        return view('borrowed.show', compact('borrow'));
-    }
-
-    public function edit($id)
-    {
-        $borrow = borrowed::findOrFail($id);
-        $users = User::all();
-        return view('borrowed.edit', compact('borrow', 'users'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $borrow = borrowed::findOrFail($id);
-
-        $request->validate([
-            'id_user' => 'required|exists:users,id_user',
-            'date_borrowed' => 'required|date',
-            'due_date' => 'required|date|after_or_equal:date_borrowed',
-            'status' => 'required|string|max:50'
+        $borrowed = Borrowed::with(['user', 'detailsBorrow.item'])->findOrFail($id);
+        return response()->json([
+            'success' => true,
+            'message' => 'Borrow detail',
+            'data' => new BorrowedResource($borrowed)
         ]);
-
-        $borrow->update($request->all());
-
-        return redirect()->route('borrowed.index')->with('success', 'Data peminjaman berhasil diperbarui.');
     }
 
-    public function destroy($id)
+    public function store(BorrowReq $request)
     {
-        $borrow = borrowed::findOrFail($id);
-        $borrow->delete();
+        $validated = $request->validated();
 
-        return redirect()->route('borrowed.index')->with('success', 'Data peminjaman berhasil dihapus.');
+        DB::beginTransaction();
+        try {
+            $borrowed = Borrowed::create([
+                'id_user' => $validated['id_user'],
+                'date_borrowed' => $validated['date_borrowed'],
+                'due_date' => $validated['due_date'],
+                'status' => 'pending'
+            ]);
+
+            foreach ($validated['details'] as $detail) {
+                $borrowed->detailsBorrow()->create([
+                    'id_items' => $detail['id_items'],
+                    'amount' => $detail['amount'],
+                    'used_for' => $detail['used_for'],
+                    'status_borrow' => 'pending'
+                ]);
+            }
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Borrow request created',
+                'data' => new BorrowedResource($borrowed->load('user', 'detailsBorrow.item'))
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create borrow request',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function approve($id)
+    {
+        $borrowed = Borrowed::with('detailsBorrow')->findOrFail($id);
+        if ($borrowed->status !== 'pending') {
+            return response()->json(['success' => false, 'message' => 'Already processed'], 400);
+        }
+
+        $borrowed->update(['status' => 'approved']);
+        $borrowed->detailsBorrow()->update(['status_borrow' => 'approved']);
+
+        return response()->json(['success' => true, 'message' => 'Borrow approved']);
+    }
+
+    public function reject($id)
+    {
+        $borrowed = Borrowed::with('detailsBorrow')->findOrFail($id);
+        if ($borrowed->status !== 'pending') {
+            return response()->json(['success' => false, 'message' => 'Already processed'], 400);
+        }
+
+        $borrowed->update(['status' => 'rejected']);
+        $borrowed->detailsBorrow()->update(['status_borrow' => 'rejected']);
+
+        return response()->json(['success' => true, 'message' => 'Borrow rejected']);
     }
 }

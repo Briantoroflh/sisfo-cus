@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_user');
             $table->dateTime('date_borrowed');
             $table->dateTime('due_date');
-            $table->enum('status', ['approved', 'not approved']);
+            $table->enum('status', ['approved', 'not approved','pending']);
             $table->timestamps();
 
             $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');

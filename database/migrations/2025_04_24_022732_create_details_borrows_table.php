@@ -18,7 +18,6 @@ return new class extends Migration
             $table->integer('amount');
             $table->string('used_for');
             $table->string('class');
-            $table->enum('status_borrow', ['borrowed', 'returned', 'overdue']);
             $table->timestamps();
 
             $table->foreign('id_items')->references('id_items')->on('items')->onDelete('cascade');
