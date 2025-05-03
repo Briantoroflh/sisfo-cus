@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
@@ -197,18 +198,18 @@
                 if (result.isConfirmed) {
                     $.ajax({
                         headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                             'Accept': 'application/json',
                             'Authorization': 'Bearer ' + token
                         },
                         url: 'http://127.0.0.1:8000/api/users/' + id,
                         method: 'DELETE',
-                        dataType: 'json',
                         success: function(response) {
                             if (response.success) {
                                 buttonElement.closest('tr').remove();
                                 Swal.fire('Deleted!', response.message, 'success');
                             } else {
-                                alert('Failed to delete user!')
+                                alert('Failed to delete!')
                             }
                         },
                         error: function(xhr, status, error) {
@@ -221,7 +222,7 @@
 
         }
 
-        $(document).on('click', '#btn-delete-user', function() {
+        $(document).on('click', '.btn-delete-user', function() {
             const userId = $(this).data('id');
             const button = $(this);
             console.log(userId);
@@ -267,7 +268,7 @@
                                         <button class="btn btn-sm btn-warning" onclick="editUser(${item.id_user})">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-danger" id="btn-delete-user" data-id="${item.id_user}">
+                                        <button class="btn btn-sm btn-danger btn-delete-user" data-id="${item.id_user}">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>

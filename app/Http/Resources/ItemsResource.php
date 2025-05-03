@@ -11,7 +11,7 @@ class ItemsResource extends JsonResource
         return [
             'id_items' => $this->id_items,
             'item_name' => $this->item_name,
-            'item_image' => $this->item_image,
+            'item_image' =>  $this->item_image ? asset('storage/' . $this->item_image) : null,
             'code_items' => $this->code_items,
             'id_category' => new CategoryItemsResource($this->whenLoaded('category')),
             'stock' => $this->stock,

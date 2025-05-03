@@ -33,12 +33,12 @@ class CategoryItemsController extends Controller
     {
         $req = $request->validated();
 
-        CategoryItems::create($req);
+        $category = CategoryItems::create($req);
 
         return response()->json([
             'success' => true,
             'message' => 'Kategori berhasil ditambahkan!',
-            'data' => new CategoryItemsResource($req)
+            'data' => new CategoryItemsResource($category)
         ])->setStatusCode(201);
     }
 

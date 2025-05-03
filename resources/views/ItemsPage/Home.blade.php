@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
@@ -116,7 +117,7 @@
             <!-- Page Heading -->
             <div class="d-sm-flex align-items-center justify-content-between mb-4">
                 <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                <button class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" id="btn-add-user">
+                <button class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" id="btn-add-items">
                     <i class="fas fa-plus fa-sm text-white-50"></i> Tambah Barang
                 </button>
             </div>
@@ -180,7 +181,7 @@
 
         $(document).ready(function() {
 
-            $('#btn-add-user').on('click', function() {
+            $('#btn-add-items').on('click', function() {
                 window.location.href = '/dashboard/items/create'
             })
 
@@ -198,15 +199,18 @@
                             const data = response.data
                             var index = 1
                             data.forEach(function(item) {
+                                let badgeClass = item.status === 'used' ? 'bg-danger' : 'bg-success';
+                                let imageUrl = item.item_image;
+
                                 $('#data-table').append(`
                                     <tr>
                                         <td>${index++}</td>
-                                        <td>${item.item_image}</td>
+                                        <td><img src="${imageUrl}" alt="Gambar Barang" style="max-width: 60px; height: auto;"></td>
                                         <td>${item.item_name}</td>
                                         <td>${item.code_items}</td>
                                         <td>${item.id_category.category_name}</td>
                                         <td>${item.stock}</td>
-                                        <td>${item.status}</td>
+                                        <td><span class="badge ${badgeClass}">${item.status}</span></td>
                                         <td>
                                             <button class="btn btn-sm btn-info">
                                                 <i class="fas fa-eye"></i>

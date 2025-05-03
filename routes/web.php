@@ -50,6 +50,14 @@ Route::get('/dashboard/items', function () {
     return view('ItemsPage.Home');
 });
 
+Route::get('/dashboard/items/create', function () {
+    return view('ItemsPage.Create');
+});
+
+Route::get('/dashboard/items/edit/{id}', function () {
+    return view('ItemsPage.Edit');
+})->where('id', '[0-9]+');
+
 Route::get('/dashboard/peminjaman', function () {
     return view('PeminjamanPage.Home');
 });

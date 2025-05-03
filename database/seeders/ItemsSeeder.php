@@ -24,6 +24,16 @@ class ItemsSeeder extends Seeder
                 'status' => 'unused',
                 'item_condition' => 'good'
             ],
+            [
+                'item_name' => 'Kabel USB',
+                'item_image' => 'kabel_usb.jpg',
+                'code_items' => 'KUSB001',
+                'id_category' => 1,
+                'stock' => 5,
+                'brand' => 'ANKER',
+                'status' => 'used',
+                'item_condition' => 'good'
+            ],
         ]);
     }
 }

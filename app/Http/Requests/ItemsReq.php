@@ -28,8 +28,6 @@ class ItemsReq extends FormRequest
             'id_category' => 'required|exists:category_items,id_category',
             'stock' => 'required|integer|min:0',
             'brand' => 'nullable|string|max:100',
-            'status' => 'required|string',
-            'item_condition' => 'required|string',
         ];
     }
 }
