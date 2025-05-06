@@ -2,6 +2,14 @@
 
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ItemsController;
+use App\Http\Controllers\DetailReturnController;
+use App\Http\Controllers\DetailBorrowController;
+use App\Http\Controllers\CategoryItemsController;
+use App\Http\Controllers\BorrowedController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,9 +31,7 @@ Route::get('/', function () {
 });
 
 Route::middleware(['role:admin'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('Dashboard.Home');
-    });
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('Dashboard.Home');
 
     Route::get('/dashboard/users', function () {
         return view('UserPage.Home');

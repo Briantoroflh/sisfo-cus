@@ -11,6 +11,7 @@ use App\Http\Controllers\DetailReturnController;
 use App\Http\Controllers\DetailBorrowController;
 use App\Http\Controllers\CategoryItemsController;
 use App\Http\Controllers\BorrowedController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +63,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //untuk admin
     Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'index']);
 
         //Users
         Route::post('/users', [UserController::class, 'store']);
