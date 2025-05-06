@@ -53,7 +53,7 @@
             <i class="fas fa-bars"></i>
         </button>
 
-        <ul class="navbar-nav ml-auto mr-3">
+        <ul class="navbar-nav ms-auto me-3">
             <li class="nav-item dropdown no-arrow mx-1">
                 <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-bell fa-fw"></i>
@@ -179,6 +179,10 @@
             window.location.href = '/'
         }
 
+        function editUser (id) {
+            window.location.href = '/dashboard/items/edit/' + id
+        }
+
         $(document).ready(function() {
 
             $('#btn-add-items').on('click', function() {
@@ -215,10 +219,10 @@
                                             <button class="btn btn-sm btn-info">
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <button class="btn btn-primary btn-sm" onclick="editUser(${item.id})">
+                                            <button class="btn btn-primary btn-sm" onclick="editUser(${item.id_items})">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="btn btn-danger btn-sm" onclick="deleteUser(${item.id})">
+                                            <button class="btn btn-danger btn-sm" onclick="deleteUser(${item.id_items})">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </td>

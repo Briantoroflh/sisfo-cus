@@ -37,12 +37,12 @@ class ItemsController extends Controller
             $data['item_image'] = $request->file('item_image')->store('item_images', 'public');
         }
 
-        items::create($data);
+        $item = items::create($data);
 
         return response()->json([
             'success' => true,
             'message' => 'Item berhasil ditambahkan!',
-            'data' => new ItemsResource($data)
+            'data' => new ItemsResource($item)
         ])->setStatusCode(201);
     }
 

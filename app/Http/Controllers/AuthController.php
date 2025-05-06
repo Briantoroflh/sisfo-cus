@@ -13,7 +13,49 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function Login(UserLoginReq $request): JsonResponse
+    public function LoginWeb(UserLoginReq $request): JsonResponse
+    {
+        try {
+            $req = $request->validated();
+            $user = User::where('email', $req['email'])->first();
+
+            if (!$user || !Hash::check($req['password'], $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Email atau password tidak di temukan!'
+                ], 404);
+            }
+
+            if ($user->role !== 'admin') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda tidak memiliki akses!'
+                ], 403);
+            }
+
+            Auth::login($user);
+
+            // Jika Anda tetap ingin token (untuk konsumsi API dari JS misalnya)
+            $user->tokens()->delete();
+            $token = $user->createToken('API_TOKEN')->plainTextToken;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Login successfuly!',
+                'token' => $token,
+                'token_type' => 'Bearer',
+                'data' => new UserResource($user)
+            ], 200);
+        } catch (QueryException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Login failed!',
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function LoginMobile(UserLoginReq $request): JsonResponse
     {
         try {
             $req = $request->validated();
@@ -25,6 +67,8 @@ class AuthController extends Controller
                     'message' => 'Email atau password tidak di temukan!'
                 ])->setStatusCode(404);
             }
+
+            $user->tokens()->delete();
 
             $token = $user->createToken('API_TOKEN')->plainTextToken;
             if (!$token) {

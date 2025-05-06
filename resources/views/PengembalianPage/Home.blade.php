@@ -52,7 +52,7 @@
             <i class="fas fa-bars"></i>
         </button>
 
-        <ul class="navbar-nav ml-auto mr-3">
+        <ul class="navbar-nav ms-auto me-3">
             <li class="nav-item dropdown no-arrow mx-1">
                 <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-bell fa-fw"></i>

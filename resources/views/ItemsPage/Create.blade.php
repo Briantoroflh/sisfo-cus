@@ -72,6 +72,9 @@
                         <div class="mb-3">
                             <label for="image" class="form-label">Upload Gambar</label>
                             <input type="file" class="form-control" id="image" accept="image/*">
+                            <div class="d-flex justify-content-center mt-2 border border-primary rounded">
+                                <img id="preview-image" src="#" alt="Preview" class="card img-fluid d-none m-5" style="max-height: 200px;">
+                            </div>
                         </div>
 
                         <!-- Kode Barang -->
@@ -121,6 +124,21 @@
         }
 
         $(document).ready(function() {
+
+            $('#image').change(function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        $('#preview-image').attr('src', e.target.result).removeClass('d-none');
+                    }
+
+                    reader.readAsDataURL(file);
+                } else {
+                    $('#preview-image').addClass('d-none').attr('src', '#');
+                }
+            });
 
             // Fetch kategori saat halaman dimuat
             $.ajax({
@@ -179,7 +197,7 @@
                             }).then(() => {
                                 window.location.href = '/dashboard/items'
                             })
-                        }else {
+                        } else {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Gagal',

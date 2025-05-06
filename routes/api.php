@@ -27,7 +27,8 @@ use App\Http\Controllers\BorrowedController;
 //     return $request->user();
 // });
 
-Route::post('/login', [AuthController::class, 'Login']);
+Route::post('/login', [AuthController::class, 'LoginWeb']);
+Route::post('/login/mobile', [AuthController::class, 'LoginMobile']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -59,7 +60,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/borrowed/{id}', [BorrowedController::class, 'show']);
     Route::post('/borrowed', [BorrowedController::class, 'store']);
 
-    Route::middleware(RoleMiddleware::class)->group(function () {
+    //untuk admin
+    Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 
         //Users
         Route::post('/users', [UserController::class, 'store']);
@@ -90,6 +92,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/borrowed/{id}/approve', [BorrowedController::class, 'approve']); // Approve
         Route::put('/borrowed/{id}/reject', [BorrowedController::class, 'reject']);
     });
-
 });
+
+
 

@@ -60,58 +60,54 @@
         <div class="row">
             <div class="col-12">
                 <div class="form-container">
-                    <h2 class="form-title">Update User</h2>
-                    <form>
-                        <!-- Name -->
+                    <h2 class="form-title">Create Item</h2>
+                    <form enctype="multipart/form-data">
+                        <!-- Nama Barang -->
                         <div class="mb-3">
-                            <label for="name" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="name" placeholder="Enter full name" autocomplete="off">
+                            <label for="name" class="form-label">Nama Barang</label>
+                            <input type="text" class="form-control" id="name" placeholder="Masukkan nama barang" autocomplete="off">
                         </div>
 
-                        <!-- Email -->
+                        <!-- Upload Gambar -->
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="email" placeholder="Enter email address" autocomplete="off">
+                            <label for="image" class="form-label">Upload Gambar</label>
+                            <input type="file" class="form-control" id="image" accept="image/*">
+                            <div class="d-flex justify-content-center mt-2 border border-primary rounded">
+                                <img id="preview-image" src="#" alt="Preview" class="card img-fluid d-none m-5" style="max-height: 200px;">
+                            </div>
                         </div>
 
-                        <!-- Password -->
+                        <!-- Kode Barang -->
                         <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" placeholder="Enter password" autocomplete="off">
+                            <label for="code" class="form-label">Kode Barang</label>
+                            <input type="text" class="form-control" id="code" placeholder="Masukkan kode barang" autocomplete="off">
                         </div>
 
-                        <!-- Role -->
+                        <!-- Stok -->
                         <div class="mb-3">
-                            <label for="role" class="form-label">Role</label>
-                            <select class="form-select" id="role" required>
-                                <option value="" selected disabled>Select role</option>
-                                <option value="user">User</option>
-                                <option value="admin">Admin</option>
+                            <label for="stock" class="form-label">Stok</label>
+                            <input type="number" class="form-control" id="stock" placeholder="Masukkan jumlah stok" min="0">
+                        </div>
+
+                        <!-- Brand -->
+                        <div class="mb-3">
+                            <label for="brand" class="form-label">Brand</label>
+                            <input type="string" class="form-control" id="brand" placeholder="Masukkan brand" autocomplete="off">
+                        </div>
+
+                        <!-- Kategori -->
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Kategori</label>
+                            <select class="form-select" id="category" required>
+                                <option value="" selected disabled>Pilih kategori</option>
                             </select>
-                        </div>
-
-                        <!-- Major -->
-                        <div class="mb-3">
-                            <label for="major" class="form-label">Major</label>
-                            <select class="form-select" id="major" required>
-                                <option value="" selected disabled>Select major</option>
-                                <option value="RPL">RPL</option>
-                                <option value="ANIMASI">ANIMASI</option>
-                                <option value="TJKT">TJKT</option>
-                                <option value="PSPT">PSPT</option>
-                                <option value="TE">TE</option>
-                            </select>
-                        </div>
-
-                        <!-- Class -->
-                        <div class="mb-3">
-                            <label for="class" class="form-label">Class</label>
-                            <input type="text" class="form-control" id="class" placeholder="Enter class" required>
                         </div>
 
                         <!-- Submit Button -->
-                        <button type="submit" class="btn btn-primary btn-register" id="btn-regis">Register User</button>
+                        <button type="submit" class="btn btn-primary btn-register" id="btn-regis">Tambah Barang</button>
                     </form>
+
+
                 </div>
             </div>
         </div>
@@ -127,7 +123,7 @@
             window.location.href = '/'
         }
 
-        var userId = window.location.pathname.split('/').pop()
+        var itemId = window.location.pathname.split('/').pop()
 
         $(document).ready(function() {
             $.ajax({
@@ -135,18 +131,23 @@
                     'Accept': 'application/json',
                     'Authorization': 'Bearer ' + token
                 },
-                url: 'http://127.0.0.1:8000/api/users/' + userId,
+                url: 'http://127.0.0.1:8000/api/items/' + itemId,
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    const user = response.data
                     if (response.success) {
-                        $('#name').val(user.name)
-                        $('#email').val(user.email)
-                        $('#password').val(user.password)
-                        $('#role').val(user.role)
-                        $('#major').val(user.major)
-                        $('#class').val(user.class)
+                        const data = response.data;
+                        $('#name').val(data.item_name);
+                        $('#code').val(data.code_items);
+                        $('#stock').val(data.stock);
+                        $('#brand').val(data.brand);
+                        $('#category').val(data.id_category);
+
+                        if (data.item_image) {
+                            $('#preview-image')
+                                .attr('src', `http://127.0.0.1:8000/storage/${data.item_image}`)
+                                .removeClass('d-none');
+                        }
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -159,52 +160,99 @@
         })
 
         $(document).ready(function() {
+
+            $('#image').change(function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        $('#preview-image').attr('src', e.target.result).removeClass('d-none');
+                    }
+
+                    reader.readAsDataURL(file);
+                } else {
+                    $('#preview-image').addClass('d-none').attr('src', '#');
+                }
+            });
+
+            // Fetch kategori saat halaman dimuat
+            $.ajax({
+                url: 'http://127.0.0.1:8000/api/category-items',
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        const data = response.data
+                        data.forEach(function(item) {
+                            $('#category').append(`<option value="${item.id_category}">${item.category_name}</option>`)
+                        })
+                    } else {
+                        console.error('Gagal mengambil kategori:', response.message)
+                    }
+
+                },
+                error: function(err) {
+                    console.error('Gagal mengambil kategori:', err)
+                }
+            })
+
+
+            // create items
             $('#btn-regis').on('click', function(e) {
                 e.preventDefault()
 
-                var name = $('#name').val()
-                var email = $('#email').val()
-                var password = $('#password').val()
-                var role = $('#role').val()
-                var major = $('#major').val()
-                var className = $('#class').val()
+                const formData = new FormData()
+                formData.append('item_name', $('#name').val())
+                formData.append('item_image', $('#image')[0].files[0])
+                formData.append('code_items', $('#code').val())
+                formData.append('stock', $('#stock').val())
+                formData.append('brand', $('#brand').val())
+                formData.append('id_category', $('#category').val())
 
                 $.ajax({
+                    url: 'http://127.0.0.1:8000/api/items', // sesuaikan endpoint
+                    method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                        'Accept': 'application/json',
-                        'Authorization': 'Bearer ' + token
+                        'Authorization': 'Bearer ' + token,
+                        'Accept': 'application/json'
                     },
-                    url: 'http://127.0.0.1:8000/api/users/' + userId,
-                    method: 'PUT',
-                    data: {
-                        name: name,
-                        email: email,
-                        password: password,
-                        role: role,
-                        major: major,
-                        class: className
-                    },
+                    data: formData,
+                    contentType: false,
+                    processData: false,
                     success: function(response) {
                         if (response.success) {
-                            console.log(response.data)
                             Swal.fire({
                                 icon: 'success',
-                                title: 'Success',
+                                title: 'Berhasil',
                                 text: response.message
                             }).then(() => {
-                                window.location.href = '/dashboard/users'
+                                window.location.href = '/dashboard/items'
                             })
                         } else {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Error',
+                                title: 'Gagal',
                                 text: response.message
                             })
                         }
+
+                    },
+                    error: function(xhr) {
+                        console.error(xhr)
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: xhr.responseJSON?.message || 'Terjadi kesalahan'
+                        })
                     }
                 })
             })
+
         })
     </script>
 </body>

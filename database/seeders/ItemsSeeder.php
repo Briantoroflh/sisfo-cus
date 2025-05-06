@@ -20,9 +20,7 @@ class ItemsSeeder extends Seeder
                 'code_items' => 'KHDMI001',
                 'id_category' => 1,
                 'stock' => 3,
-                'brand' => 'SONY',
-                'status' => 'unused',
-                'item_condition' => 'good'
+                'brand' => 'SONY'
             ],
             [
                 'item_name' => 'Kabel USB',
@@ -30,9 +28,7 @@ class ItemsSeeder extends Seeder
                 'code_items' => 'KUSB001',
                 'id_category' => 1,
                 'stock' => 5,
-                'brand' => 'ANKER',
-                'status' => 'used',
-                'item_condition' => 'good'
+                'brand' => 'ANKER'
             ],
         ]);
     }
