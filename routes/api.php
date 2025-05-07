@@ -12,6 +12,7 @@ use App\Http\Controllers\DetailBorrowController;
 use App\Http\Controllers\CategoryItemsController;
 use App\Http\Controllers\BorrowedController;
 use App\Http\Controllers\DashboardController;
+use App\Models\DetailReturns;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,8 +46,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('items/{id}', [ItemsController::class, 'show'])->where('id', '[0-9]+');
 
     // untuk melihat semua detail return dan detail return
-    Route::get('/returns', [DetailReturnController::class, 'index']);
-    Route::get('/returns/{id}', [DetailReturnController::class, 'show'])->where('id', '[0-9]+');
+    Route::get('/detail-returns', [DetailReturnController::class, 'index']);
+    Route::get('/detail-returns/{id}', [DetailReturnController::class, 'show'])->where('id', '[0-9]+');
+    Route::post('/detail-returns', [DetailReturnController::class, 'store']);
 
     // untuk melihat semua detail borrow dan detail borrow
     Route::get('/details-borrow', [DetailBorrowController::class, 'index']);
@@ -78,11 +80,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('items/{id}', [ItemsController::class, 'update'])->where('id', '[0-9]+');
         Route::delete('items/{id}', [ItemsController::class, 'destroy'])->where('id', '[0-9]+');
 
-        // Detail Returns
-        Route::post('detail-returns', [DetailReturnController::class, 'store']);
-        Route::put('detail-returns/{id}', [DetailReturnController::class, 'update'])->where('id', '[0-9]+');
-        Route::delete('detail-returns/{id}', [DetailReturnController::class, 'destroy'])->where('id', '[0-9]+');
-
         // Category Items
         Route::post('category-items', [CategoryItemsController::class, 'store']);
         Route::put('category-items/{id}', [CategoryItemsController::class, 'update'])->where('id', '[0-9]+');
@@ -91,6 +88,10 @@ Route::middleware('auth:sanctum')->group(function () {
         // Borrowed
         Route::put('/borrowed/{id}/approve', [BorrowedController::class, 'approve'])->where('id', '[0-9]+'); // Approve
         Route::put('/borrowed/{id}/reject', [BorrowedController::class, 'reject'])->where('id', '[0-9]+'); // Reject
+
+        // Detail return
+        Route::put('/details-return/{id}/approve', [DetailReturnController::class, 'approve'])->where('id', '[0-9]+'); // Approve
+        Route::put('/details-return/{id}/reject', [DetailReturnController::class, 'reject'])->where('id', '[0-9]+'); // Reject
     });
 });
 

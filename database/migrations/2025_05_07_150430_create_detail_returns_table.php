@@ -13,9 +13,16 @@ return new class extends Migration
     {
         Schema::create('detail_returns', function (Blueprint $table) {
             $table->id('id_detail_return');
-            $table->foreignId('id_details_borrow')->constrained('details_borrows', 'id_details_borrow')->onDelete('cascade');
+            $table->unsignedBigInteger('id_borrowed'); // Pastikan unsignedBigInteger
+            $table->enum('status', ['approve', 'not approve', 'pending'])->default('pending');
+            $table->tinyInteger('soft_delete')->default(0);
             $table->dateTime('date_return');
             $table->timestamps();
+
+            $table->foreign('id_borrowed')
+                ->references('id_borrowed')
+                ->on('borroweds')
+                ->onDelete('cascade');
         });
     }
 

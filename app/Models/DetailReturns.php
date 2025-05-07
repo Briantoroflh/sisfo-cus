@@ -12,12 +12,14 @@ class DetailReturns extends Model
     protected $table = 'detail_returns';
     protected $primaryKey = 'id_detail_return';
     protected $fillable = [
-        'id_details_borrow',
-        'date_return'
+        'id_borrowed',
+        'status',
+        'soft_delete',
+        'date_return',
     ];
 
-    public function detailsBorrow()
+    public function borrowed()
     {
-        return $this->belongsTo(DetailsBorrow::class, 'id_details_borrow', 'id_details_borrow');
+        return $this->belongsTo(Borrowed::class, 'id_borrowed', 'id_borrowed');
     }
 }

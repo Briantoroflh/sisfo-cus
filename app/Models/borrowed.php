@@ -30,4 +30,6 @@ class borrowed extends Model
     {
         return $this->belongsTo(DetailsBorrow::class, 'id_details_borrow', 'id_details_borrow');
     }
+
+    
 }
