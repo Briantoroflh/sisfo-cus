@@ -35,20 +35,6 @@
         <button id="sidebarToggle" class="btn btn-link toggle-sidebar">
             <i class="fas fa-bars"></i>
         </button>
-        <ul class="navbar-nav ms-auto me-3">
-            <li class="nav-item dropdown no-arrow">
-                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <span class="me-2 text-gray-600 small">Admin</span>
-                    <img class="img-profile rounded-circle" src="/api/placeholder/40/40" alt="Admin">
-                </a>
-                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                    <a class="dropdown-item" href="#"><i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i> Profil</a>
-                    <a class="dropdown-item" href="#"><i class="fas fa-cogs fa-sm fa-fw me-2 text-gray-400"></i> Pengaturan</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i> Logout</a>
-                </div>
-            </li>
-        </ul>
     </nav>
 
     <!-- Content -->
