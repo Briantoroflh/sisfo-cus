@@ -13,15 +13,20 @@ return new class extends Migration
     {
         Schema::create('details_borrows', function (Blueprint $table) {
             $table->id('id_details_borrow');
-            $table->unsignedBigInteger('id_items');
-            $table->unsignedBigInteger('id_borrowed');
+            $table->unsignedBigInteger('id_items'); // Ensure this is unsignedBigInteger
             $table->integer('amount');
             $table->string('used_for');
             $table->string('class');
+            $table->dateTime('date_borrowed');
+            $table->dateTime('due_date');
             $table->timestamps();
 
-            $table->foreign('id_items')->references('id_items')->on('items')->onDelete('cascade');
-            $table->foreign('id_borrowed')->references('id_borrowed')->on('borroweds')->onDelete('cascade');
+            // Foreign key constraint
+            $table->foreign('id_items')
+                ->references('id_items')
+                ->on('items')
+                ->onDelete('cascade');
+
         });
     }
 

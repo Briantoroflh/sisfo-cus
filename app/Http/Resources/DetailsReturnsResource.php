@@ -10,9 +10,8 @@ class DetailReturnsResource extends JsonResource
     {
         return [
             'id_detail_return' => $this->id_detail_return,
-            'id_details_borrow' => $this->id_details_borrow,
+            'id_details_borrow' => new DetailsBorrowResource($this->whenLoaded('detailsBorrow')),
             'date_return' => $this->date_return,
-            'details_borrow' => new DetailsBorrowResource($this->whenLoaded('detailsBorrow')),
         ];
     }
 }

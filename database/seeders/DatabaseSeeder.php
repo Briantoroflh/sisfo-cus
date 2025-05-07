@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
             Userseeder::class,
             CategorySeeder::class,
             ItemsSeeder::class,
-           
+            PeminjamanSeeder::class
         ]);
     }
 }

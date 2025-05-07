@@ -37,12 +37,7 @@
             <a href="{{ url('/dashboard/pengembalian') }}" class="list-group-item active">
                 <i class="fas fa-arrow-circle-up"></i> Data Pengembalian
             </a>
-            <a href="#" class="list-group-item">
-                <i class="fas fa-cog"></i> Pengaturan
-            </a>
-            <a href="#" class="list-group-item">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </a>
+            <a href="#" id="logoutButton" class="list-group-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </div>
     <!-- Content -->
@@ -110,6 +105,14 @@
         if (!token) {
             window.location.href = '/'
         }
+
+        document.getElementById('logoutButton').addEventListener('click', function(e) {
+            e.preventDefault();
+            // Remove token from localStorage
+            localStorage.removeItem('token');
+            // Redirect to login page
+            window.location.href = '/'; // Sesuaikan dengan URL login Anda  
+        });
 
         // Toggle Sidebar
         document.getElementById('sidebarToggle').addEventListener('click', function() {

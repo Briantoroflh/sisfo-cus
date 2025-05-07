@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // untuk melihat semua detail borrow dan detail borrow
     Route::get('/details-borrow', [DetailBorrowController::class, 'index']);
     Route::get('/details-borrow/{id}', [DetailBorrowController::class, 'show'])->where('id', '[0-9]+');
+    Route::get('/details-borrow/{id}/items', [DetailBorrowController::class, 'getItemsByDetailBorrow'])->where('id', '[0-9]+');
 
     // untuk melihat semua category items dan detail category items
     Route::get('category-items', [CategoryItemsController::class, 'index']);
@@ -82,19 +83,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('detail-returns/{id}', [DetailReturnController::class, 'update'])->where('id', '[0-9]+');
         Route::delete('detail-returns/{id}', [DetailReturnController::class, 'destroy'])->where('id', '[0-9]+');
 
-        // Details Borrow
-        Route::post('details-borrow', [DetailBorrowController::class, 'store']);
-        Route::put('details-borrow/{id}', [DetailBorrowController::class, 'update'])->where('id', '[0-9]+');
-        Route::delete('details-borrow/{id}', [DetailBorrowController::class, 'destroy'])->where('id', '[0-9]+');
-
         // Category Items
         Route::post('category-items', [CategoryItemsController::class, 'store']);
         Route::put('category-items/{id}', [CategoryItemsController::class, 'update'])->where('id', '[0-9]+');
         Route::delete('category-items/{id}', [CategoryItemsController::class, 'destroy'])->where('id', '[0-9]+');
 
         // Borrowed
-        Route::put('/borrowed/{id}/approve', [BorrowedController::class, 'approve']); // Approve
-        Route::put('/borrowed/{id}/reject', [BorrowedController::class, 'reject']);
+        Route::put('/borrowed/{id}/approve', [BorrowedController::class, 'approve'])->where('id', '[0-9]+'); // Approve
+        Route::put('/borrowed/{id}/reject', [BorrowedController::class, 'reject'])->where('id', '[0-9]+'); // Reject
     });
 });
 

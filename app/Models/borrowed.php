@@ -13,9 +13,11 @@ class borrowed extends Model
     protected $primaryKey = 'id_borrowed';
     protected $fillable = [
         'id_user',
+        'id_details_borrow',
         'date_borrowed',
         'due_date',
-        'status'
+        'status',
+        'soft_delete',
     ];
 
     public function user()
@@ -23,8 +25,9 @@ class borrowed extends Model
         return $this->belongsTo(User::class, 'id_user', 'id_user');
     }
 
+    // Relasi ke Detail Borrow
     public function detailsBorrow()
     {
-        return $this->hasMany(DetailsBorrow::class, 'id_borrowed', 'id_borrowed');
+        return $this->belongsTo(DetailsBorrow::class, 'id_details_borrow', 'id_details_borrow');
     }
 }

@@ -22,13 +22,10 @@ class BorrowReq extends FormRequest
     public function rules(): array
     {
         return [
-            'id_user' => 'required|exists:users,id_user',
-            'date_borrowed' => 'required|date',
-            'due_date' => 'required|date|after_or_equal:date_borrowed',
-            'details' => 'required|array|min:1',
-            'details.*.id_items' => 'required|exists:items,id_items',
-            'details.*.amount' => 'required|integer|min:1',
-            'details.*.used_for' => 'required|string'
+            'id_user'           => 'required|exists:users,id_user',
+            'id_details_borrow' => 'required|exists:details_borrows,id_details_borrow',
+            'status'            => 'required|in:approved,not approved,pending',
+            'soft_delete'       => 'nullable|in:0,1',
         ];
     }
 }

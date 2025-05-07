@@ -13,24 +13,21 @@ class DetailsBorrow extends Model
     protected $primaryKey = 'id_details_borrow';
     protected $fillable = [
         'id_items',
-        'id_borrowed',
-        'status_borrow',
+        'amount',
         'used_for',
-        'amount'
+        'class',
+        'date_borrowed',
+        'due_date',
     ];
-
-    public function borrowed()
-    {
-        return $this->belongsTo(Borrowed::class, 'id_borrowed', 'id_borrowed');
-    }
 
     public function item()
     {
-        return $this->belongsTo(Items::class, 'id_items', 'id_items');
+        return $this->belongsTo(items::class, 'id_items');
     }
 
-    public function detailReturn()
+    // Relasi ke borroweds
+    public function borrowed()
     {
-        return $this->hasOne(DetailReturns::class, 'id_details_borrow', 'id_details_borrow');
+        return $this->hasOne(Borrowed::class, 'id_details_borrow');
     }
 }

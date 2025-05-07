@@ -16,9 +16,28 @@ class DetailBorrowController extends Controller
         return DetailsBorrowResource::collection($details);
     }
 
-    public function show($id)
+    public function getItemsByDetailBorrow($id)
     {
-        $detail = DetailsBorrow::with(['item', 'borrowed.user', 'detailReturn'])->findOrFail($id);
-        return new DetailsBorrowResource($detail);
+        $detailBorrows = DetailsBorrow::with('item.category')
+            ->where('id_details_borrow', $id)
+            ->get();
+
+        if ($detailBorrows->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Detail tidak ditemukan.'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $detailBorrows->map(function ($detail) {
+                return [
+                    'item_name' => $detail->item->item_name ?? '-',
+                    'category_name' => $detail->item->category->category_name ?? '-',
+                    'quantity' => $detail->amount,
+                ];
+            })
+        ]);
     }
 }

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Registration</title>
-    <!-- Bootstrap CSS -->
+    <title>Edit Item</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -53,6 +53,8 @@
             box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
         }
     </style>
+    ```
+
 </head>
 
 <body>
@@ -60,7 +62,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="form-container">
-                    <h2 class="form-title">Create Item</h2>
+                    <h2 class="form-title">Edit Item</h2>
                     <form enctype="multipart/form-data">
                         <!-- Nama Barang -->
                         <div class="mb-3">
@@ -72,6 +74,7 @@
                         <div class="mb-3">
                             <label for="image" class="form-label">Upload Gambar</label>
                             <input type="file" class="form-control" id="image" accept="image/*">
+                            <input type="hidden" id="old_image" name="old_image">
                             <div class="d-flex justify-content-center mt-2 border border-primary rounded">
                                 <img id="preview-image" src="#" alt="Preview" class="card img-fluid d-none m-5" style="max-height: 200px;">
                             </div>
@@ -104,28 +107,28 @@
                         </div>
 
                         <!-- Submit Button -->
-                        <button type="submit" class="btn btn-primary btn-register" id="btn-regis">Tambah Barang</button>
+                        <button type="submit" class="btn btn-primary btn-register" id="btn-regis">Update Barang</button>
                     </form>
-
-
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
     <script>
         const token = localStorage.getItem('token')
         if (!token) {
             window.location.href = '/'
         }
 
-        var itemId = window.location.pathname.split('/').pop()
+        const itemId = window.location.pathname.split('/').pop()
 
         $(document).ready(function() {
+            // Load item data
             $.ajax({
                 headers: {
                     'Accept': 'application/json',
@@ -145,9 +148,12 @@
 
                         if (data.item_image) {
                             $('#preview-image')
-                                .attr('src', `http://127.0.0.1:8000/storage/${data.item_image}`)
+                                .attr('src', `http://127.0.0.1:8000${data.item_image}`)
                                 .removeClass('d-none');
+                            $('#old_image').val(data.item_image);
                         }
+
+                        console.log('Gambar URL:', `http://127.0.0.1:8000/storage/${data.item_image}`);
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -156,27 +162,30 @@
                         })
                     }
                 },
-            })
-        })
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Gagal mengambil data item.'
+                    })
+                }
+            });
 
-        $(document).ready(function() {
-
+            // Preview image
             $('#image').change(function(event) {
                 const file = event.target.files[0];
                 if (file) {
                     const reader = new FileReader();
-
                     reader.onload = function(e) {
                         $('#preview-image').attr('src', e.target.result).removeClass('d-none');
                     }
-
                     reader.readAsDataURL(file);
                 } else {
                     $('#preview-image').addClass('d-none').attr('src', '#');
                 }
             });
 
-            // Fetch kategori saat halaman dimuat
+            // Load categories
             $.ajax({
                 url: 'http://127.0.0.1:8000/api/category-items',
                 method: 'GET',
@@ -193,28 +202,41 @@
                     } else {
                         console.error('Gagal mengambil kategori:', response.message)
                     }
-
                 },
                 error: function(err) {
                     console.error('Gagal mengambil kategori:', err)
                 }
-            })
+            });
 
-
-            // create items
+            // Submit form
             $('#btn-regis').on('click', function(e) {
-                e.preventDefault()
+                e.preventDefault();
 
-                const formData = new FormData()
-                formData.append('item_name', $('#name').val())
-                formData.append('item_image', $('#image')[0].files[0])
-                formData.append('code_items', $('#code').val())
-                formData.append('stock', $('#stock').val())
-                formData.append('brand', $('#brand').val())
-                formData.append('id_category', $('#category').val())
+                const formData = new FormData();
+                formData.append('_method', 'PUT'); // WAJIB
+                formData.append('item_name', $('#name').val());
+
+                const imageFile = $('#image')[0].files[0];
+                if (imageFile) {
+                    formData.append('item_image', imageFile);
+                }
+
+                formData.append('code_items', $('#code').val());
+                formData.append('stock', $('#stock').val());
+                formData.append('brand', $('#brand').val());
+                formData.append('id_category', $('#category').val());
+
+                console.log({
+                    item_name: $('#name').val(),
+                    code_items: $('#code').val(),
+                    stock: $('#stock').val(),
+                    brand: $('#brand').val(),
+                    id_category: $('#category').val(),
+                    item_image: $('#image')[0].files[0] || $('#old_image').val()
+                });
 
                 $.ajax({
-                    url: 'http://127.0.0.1:8000/api/items', // sesuaikan endpoint
+                    url: 'http://127.0.0.1:8000/api/items/' + itemId,
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
@@ -232,29 +254,29 @@
                                 text: response.message
                             }).then(() => {
                                 window.location.href = '/dashboard/items'
-                            })
+                            });
                         } else {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Gagal',
                                 text: response.message
-                            })
+                            });
                         }
-
                     },
                     error: function(xhr) {
-                        console.error(xhr)
+                        console.error(xhr);
                         Swal.fire({
                             icon: 'error',
                             title: 'Gagal',
                             text: xhr.responseJSON?.message || 'Terjadi kesalahan'
-                        })
+                        });
                     }
-                })
-            })
-
-        })
+                });
+            });
+        });
     </script>
+    ```
+
 </body>
 
 </html>

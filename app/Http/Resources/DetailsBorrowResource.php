@@ -10,16 +10,12 @@ class DetailsBorrowResource extends JsonResource
     {
         return [
             'id_details_borrow' => $this->id_details_borrow,
-            'item' => $this->item->name ?? null,
-            'amount' => $this->amount,
-            'used_for' => $this->used_for,
-            'status_borrow' => $this->status_borrow,
-            'borrowed_by' => $this->borrowed->user->name ?? null,
-            'date_borrowed' => $this->borrowed->date_borrowed,
-            'due_date' => $this->borrowed->due_date,
-            'return_info' => $this->detailReturn ? [
-                'date_return' => $this->detailReturn->date_return
-            ] : null
+            'id_items'          => new ItemsResource($this->whenLoaded('item')),
+            'class'             => $this->class,
+            'used_for'          => $this->used_for,
+            'amount'            => $this->amount,
+            'date_borrowed'     => $this->date_borrowed,
+            'due_date'          => $this->due_date,
         ];
     }
 }

@@ -10,12 +10,9 @@ class BorrowedResource extends JsonResource
     {
         return [
             'id_borrowed' => $this->id_borrowed,
-            'id_user' => $this->id_user,
-            'user_name' => $this->user->name ?? null,
-            'date_borrowed' => $this->date_borrowed,
-            'due_date' => $this->due_date,
+            'id_user' => new userResource($this->whenLoaded('user')),
+            'id_details_borrow' => new DetailsBorrowResource($this->whenLoaded('detailsBorrow')),
             'status' => $this->status,
-            'details_borrow' => DetailsBorrowResource::collection($this->detailsBorrow)
         ];
     }
 }

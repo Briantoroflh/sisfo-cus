@@ -23,10 +23,10 @@ class DetailBorrowReq extends FormRequest
     {
         return [
             'id_items' => 'required|integer',
-            'id_borrowed' => 'required|integer',
-            'status_borrow' => 'required|string',
             'used_for' => 'required|string|max:255',
             'amount' => 'required|integer|min:1',
+            'date_borrowed'     => 'required|date',
+            'due_date'          => 'required|date|after_or_equal:date_borrowed',
         ];
     }
 }

@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BorrowReq;
 use App\Http\Requests\DetailBorrowReq;
 use App\Http\Resources\BorrowedResource;
+use App\Http\Resources\DetailsBorrowResource;
 use App\Models\borrowed;
+use App\Models\DetailsBorrow;
 use App\Models\items;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +19,8 @@ class BorrowedController extends Controller
 {
     public function index()
     {
-        $data = Borrowed::with(['user', 'detailsBorrow.item'])->latest()->get();
+        $data = Borrowed::with(['user', 'detailsBorrow.item'])->where('soft_delete', 0)->latest()->get();
+
         return response()->json([
             'success' => true,
             'message' => 'List of borrow requests',
@@ -35,67 +38,43 @@ class BorrowedController extends Controller
         ]);
     }
 
-    public function store(BorrowReq $request)
+    public function store(DetailBorrowReq $request)
     {
-        $validated = $request->validated();
+        $detail = DetailsBorrow::create($request->validated());
 
-        DB::beginTransaction();
-        try {
-            $borrowed = Borrowed::create([
-                'id_user' => $validated['id_user'],
-                'date_borrowed' => $validated['date_borrowed'],
-                'due_date' => $validated['due_date'],
-                'status' => 'pending'
-            ]);
+        $user = Auth::user();
 
-            foreach ($validated['details'] as $detail) {
-                $borrowed->detailsBorrow()->create([
-                    'id_items' => $detail['id_items'],
-                    'amount' => $detail['amount'],
-                    'used_for' => $detail['used_for'],
-                    'status_borrow' => 'pending'
-                ]);
-            }
+        Borrowed::create([
+            'id_user' => $user->id_user,
+            'id_details_borrow' => $detail->id_details_borrow,
+            'status' => 'pending',
+        ]);
 
-            DB::commit();
-            return response()->json([
-                'success' => true,
-                'message' => 'Borrow request created',
-                'data' => new BorrowedResource($borrowed->load('user', 'detailsBorrow.item'))
-            ], 201);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create borrow request',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'message' => 'Peminjaman berhasil diajukan.',
+            'data' => new DetailsBorrowResource($detail)
+        ], 201);
     }
 
     public function approve($id)
     {
-        $borrowed = Borrowed::with('detailsBorrow')->findOrFail($id);
-        if ($borrowed->status !== 'pending') {
-            return response()->json(['success' => false, 'message' => 'Already processed'], 400);
-        }
-
+        $borrowed = Borrowed::findOrFail($id);
         $borrowed->update(['status' => 'approved']);
-        $borrowed->detailsBorrow()->update(['status_borrow' => 'approved']);
 
-        return response()->json(['success' => true, 'message' => 'Borrow approved']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Peminjaman disetujui.'
+        ]);
     }
 
     public function reject($id)
     {
-        $borrowed = Borrowed::with('detailsBorrow')->findOrFail($id);
-        if ($borrowed->status !== 'pending') {
-            return response()->json(['success' => false, 'message' => 'Already processed'], 400);
-        }
+        $borrowed = Borrowed::findOrFail($id);
+        $borrowed->update(['soft_delete' => 1, 'status' => 'not approved']);
 
-        $borrowed->update(['status' => 'rejected']);
-        $borrowed->detailsBorrow()->update(['status_borrow' => 'rejected']);
-
-        return response()->json(['success' => true, 'message' => 'Borrow rejected']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Peminjaman ditolak dan ditandai sebagai soft delete.'
+        ]);
     }
 }
