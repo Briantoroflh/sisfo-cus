@@ -30,13 +30,6 @@
         </div>
     </div>
 
-    <!-- Top Bar -->
-    <nav id="topbar" class="navbar navbar-expand navbar-light">
-        <button id="sidebarToggle" class="btn btn-link toggle-sidebar">
-            <i class="fas fa-bars"></i>
-        </button>
-    </nav>
-
     <!-- Content -->
     <div id="content-wrapper">
         <div class="container-fluid">

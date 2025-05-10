@@ -25,6 +25,7 @@ class DetailBorrowReq extends FormRequest
             'id_items' => 'required|integer',
             'used_for' => 'required|string|max:255',
             'amount' => 'required|integer|min:1',
+            'class' => 'required|string|max:255',
             'date_borrowed'     => 'required|date',
             'due_date'          => 'required|date|after_or_equal:date_borrowed',
         ];

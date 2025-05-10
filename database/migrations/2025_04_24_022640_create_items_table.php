@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('brand')->nullable();
             $table->enum('status', ['used', 'unused'])->default('unused');
             $table->enum('item_condition', ['good', 'broken'])->default('good');
-            $table->enum('status_borrow', ['borrowed', 'returned', 'overdue'])->nullable();
             $table->timestamps();
 
             $table->foreign('id_category')->references('id_category')->on('category_items')->onDelete('cascade');
