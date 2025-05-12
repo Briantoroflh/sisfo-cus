@@ -17,6 +17,8 @@ return new class extends Migration
             $table->enum('status', ['approve', 'not approve', 'pending'])->default('pending');
             $table->tinyInteger('soft_delete')->default(0);
             $table->dateTime('date_return');
+            $table->string('description')->nullable();
+            $table->string('item_image')->nullable();
             $table->timestamps();
 
             $table->foreign('id_borrowed')
