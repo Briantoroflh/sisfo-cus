@@ -23,7 +23,8 @@ class DetailReturnReq extends FormRequest
     {
         return [
             'id_borrowed' => 'required|exists:borroweds,id_borrowed',
-            'status' => 'required|in:approve,not approve,pending',
+            'description' => 'required|string|max:255',
+            'item_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'date_return' => 'required|date',
         ];
     }

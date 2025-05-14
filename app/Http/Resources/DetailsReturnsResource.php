@@ -11,6 +11,7 @@ class DetailsReturnsResource extends JsonResource
         return [
             'id_detail_return' => $this->id_detail_return,
             'user_name' => $this->borrowed->user->name,
+            'code_item' => $this->borrowed->detailsBorrow->item->code_items,
             'user_email' => $this->borrowed->user->email,
             'date_return' => $this->date_return,
             'status' => $this->status,
